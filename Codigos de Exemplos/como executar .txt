@@ -1,0 +1,1 @@
+./executaFork nomeDoPrograma ./nomeDaPasta
