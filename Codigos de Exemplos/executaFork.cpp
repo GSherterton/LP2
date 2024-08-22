@@ -10,8 +10,9 @@
 using namespace std;
 using namespace filesystem;
 
-vector<string> listPath(string pasta){
+vector<string> listPath(const string& pasta){
     vector<string> vec;
+    //vec.resize(pasta.size());
 
     for(auto it : directory_iterator(pasta)){
         vec.push_back(it.path().string());
@@ -20,7 +21,7 @@ vector<string> listPath(string pasta){
     return vec;
 }
 
-void executa(string path, string programa, string instancia){
+void executa(const string& path, const string& programa, const string& instancia){
     cout << "Chamando a instancia " << instancia.c_str() << endl;
     execl((path+"/"+programa).c_str(), programa.c_str(), instancia.c_str(), NULL);
 }
