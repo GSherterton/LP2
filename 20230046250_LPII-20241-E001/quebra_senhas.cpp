@@ -11,6 +11,7 @@
 #include <fstream>
 #include <filesystem>
 #include <pthread.h>
+#include <string.h>
 
 using namespace std;
 using namespace filesystem;
@@ -41,6 +42,55 @@ char* encrypt(const char* str) {
     
     str_result[TAMANHO_SENHA] = '\0'; // Finaliza a string
     return str_result;
+}
+
+//funcao que vai incrementar a string que sera testada
+void incrementaString(char* str, const int& index){
+    //condicao de parada caso de "overflow" na string
+    if(index < 0){
+        return;
+    }
+
+    if(str[index] == 'Z'){
+        str[index] = 'A';
+        incrementaString(str, index-1);
+    }else{
+        str[index]++;
+    }
+}
+
+void* descriptografa(void* senha){
+    //inicializa os testes com AAAA
+    char teste[] = "AAAA";
+
+    //cout << "Senha: " << (char*) senha << endl;//debug
+
+    while(1){
+        // cout << "Str: " << teste << endl;//debug
+
+        //se bateu a senha que eu queria achar com o resultado do meu teste
+        //entao achei a senha descriptografada
+        if(strcmp(encrypt(teste), (char*)senha) == 0){
+            cout << "Senha encontrada: " << teste << endl;//debug
+            //teste eh um array nao um ponteiro, e eh local, logo eh necessario criar
+            //um ponteiro para char que armazene a mesma coisa e seja usado no retorno
+            char* result = (char*) new char(strlen(teste)+1);
+            strcpy(result, teste);
+            return (void*)result;
+        }
+
+        //finaliza caso testar com ZZZZ e nao achar
+        if(strcmp(teste, "ZZZZ") == 0){
+            cout << "Cheguei em ZZZZ\n";
+            break;
+        }
+
+        incrementaString(teste, strlen(teste)-1);
+    }
+
+    //Nao encontrou a senha
+    cout << "Nao encontrei a senha\n";
+    return NULL;
 }
 
 //funcao que armazena as senhas no vector
@@ -103,38 +153,94 @@ int main(int argc, char** argv){
     if(!argcIsValid(argc)){
         return -1;
     }
-
+    
     string arquivo = argv[1];
 
     //cria um vector de senhas com as senhas do arquivo
     vector<string> senhasCriptografadas = read(arquivo);
-    int n = senhasCriptografadas.size();//armazena a qtd de senhas
 
-    //cria um vector para guardar as senhas descriptografadas
-    vector<string> senhasDescriptografadas;
-    senhasDescriptografadas.resize(n);
+    //tentando rodar uma vez so
+
+    //cria um array para guardar as senhas descriptografadas
+    void* senhasDescriptografadas;
+
+    //criar as variaveis do tipo thread para cada senha presente no arquivo
+    pthread_t thread;
 
     /*
-    //criar as variaveis do tipo thread para cada senha presente no arquivo
-    pthread_t thread[n];
-
     //cria uma thread que vai executar a funcao com cada senha
-    for(int i = 0; i < n; i++){
-        pthread_create(&thread[i], NULL, executa, (void*)aux[i]);
-    }
+    pthread_create(&thread, NULL, descriptografa, (void*)(senhasCriptografadas[0].c_str()));
 
-    //da um join em cada thread
-    for(int i = 0; i < n; i++){
-        pthread_join(thread[i], senhasDescriptografadas[i]);
-    }
+    //da um join em cada thread e armazena a resposta nesse array
+    pthread_join(thread, &senhasDescriptografadas);
     */
 
+    //visualiza as senhas criptografadas
+    cout << "Senhas Criptografadas:\n";
+    cout << "Senha [0]: " << senhasCriptografadas[0] << endl;
+    
+    cout << endl;
 
-    for(int i = 0; i < senhasCriptografadas.size(); i++){
-        cout << "Senha [" << i << "]: " << senhasCriptografadas[i] << endl;
-    }
+
+    void* ans = descriptografa((void*)(senhasCriptografadas[0].c_str()));
+
+    //visualiza as senhas descriptografadas
+    cout << "Senha Descriptografada:\n";
+    cout << "Senha [0]: " << (char*)ans << endl;
 
     cout << "Rodando " << arquivo << endl;
+
+
+    // int n = senhasCriptografadas.size();//armazena a qtd de senhas
+
+    // //cria um array para guardar as senhas descriptografadas
+    // void* senhasDescriptografadas[n];
+
+    // //criar as variaveis do tipo thread para cada senha presente no arquivo
+    // pthread_t thread[n];
+
+    // //cria uma thread que vai executar a funcao com cada senha
+    // for(int i = 0; i < n; i++){
+    //     pthread_create(&thread[i], NULL, descriptografa, (void*)(senhasCriptografadas[i].c_str()));
+    // }
+
+    // //da um join em cada thread e armazena a resposta nesse array
+    // for(int i = 0; i < n; i++){
+    //     pthread_join(thread[i], &senhasDescriptografadas[i]);
+    // }
+
+    // //visualiza as senhas criptografadas
+    // cout << "Senhas Criptografadas:\n";
+    // for(int i = 0; i < n; i++){
+    //     cout << "Senha [" << i << "]: " << senhasCriptografadas[i] << endl;
+    // }
+
+    // cout << endl;
+
+    // //visualiza as senhas descriptografadas
+    // // for(int i = 0; i < senhasCriptografadas.size(); i++){
+    // cout << "Senhas Descriptografadas:\n";
+    // for(int i = 0; i < n; i++){
+    //     cout << "Senha [" << i << "]: " << (char*)senhasDescriptografadas[i] << endl;
+    // }
+
+    // cout << "Rodando " << arquivo << endl;
+    //-------------------------------------------------------------------------------------------
+    /*
+    char senha[] = "LCII";
+    cout << encrypt(senha) << endl;
+
+    string str;
+    cin >> str;
+
+    void* ans; // = descriptografa((void*)(str.c_str()));
+
+    pthread_t thread;
+    pthread_create(&thread, NULL, descriptografa, (void*)(str.c_str()));
+    pthread_join(thread, &ans);
+
+    cout << "Resposta: " << (char*)ans << endl;
+    */
 
     return 0;
 }
