@@ -140,10 +140,32 @@ vector<string> read(const string& arquivo){
     return vec;
 }
 
+void write(void* senhas[], const int& n, const string& saida){
+    //cria um fluxo de saida (para escrever no arquivo)
+    ofstream fp;
+
+    //tenta abrir o arquivo
+    fp.open(saida);
+
+    //verifica se o arquivo foi aberto
+    if(!fp.is_open()){
+        cout << "Nao foi possivel abrir o arquivo\n";
+        return;
+    }
+
+    //escreve todas as senhas no arquivo
+    for(int i = 0; i < n; i++){
+        fp << (char*)senhas[i] << endl;
+    }
+
+    //fecha o arquivo
+    fp.close();
+}
+
 //verifica se a quantidade de parametros passados na chamada do programa esta correta
 bool argcIsValid(const int& argc){
-    if(argc < 2){
-        cout << "Esta faltando o nome do arquivo.\n";
+    if(argc < 3){
+        cout << "Esta faltando o nome do arquivo e/ou o nome da saida.\n";
         return false;
     }
 
@@ -160,11 +182,17 @@ int main(int argc, char** argv){
         return -1;
     }
     
+    //le o nome do argumento que representa a pasta e o nome do arquivo da instancia
+    string caminho = (string)argv[1] + (string)argv[2];
+
     //le o nome do argumento que representa o nome do arquivo da instancia
-    string arquivo = argv[1];
+    string arquivo = argv[2];
+
+    //le o nome do argumento que representa o nome da pasta de saida
+    string saida = (string)argv[3]+"dec_"+arquivo;
 
     //cria um vector de senhas com as senhas do arquivo
-    vector<string> senhasCriptografadas = read(arquivo);
+    vector<string> senhasCriptografadas = read(caminho);
 
     int n = senhasCriptografadas.size();//armazena a qtd de senhas
 
@@ -184,10 +212,10 @@ int main(int argc, char** argv){
         pthread_join(thread[i], &senhasDescriptografadas[i]);
     }
 
-    //imprimi cada senha descriptografada em ordem
-    for(int i = 0; i < n; i++){
-        cout << (char*)senhasDescriptografadas[i] << endl;
-    }
+    //escreve as senhas descriptografadas em uma pasta especificada
+    write(senhasDescriptografadas, n, saida);
+
+    cout << "Processo PID " << getpid() << ": Senhas quebradas salvas em " << saida << endl;
 
     return 0;
 }
