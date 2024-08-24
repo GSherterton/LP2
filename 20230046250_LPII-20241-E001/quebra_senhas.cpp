@@ -76,15 +76,10 @@ void* descriptografa(void* senha){
     //inicializa os testes com AAAA
     char teste[] = "AAAA";
 
-    // cout << "Senha: " << (char*) senha << endl;//debug
-
     while(1){
-        // cout << "Str: " << teste << endl;//debug
-
         //se bateu a senha que eu queria achar com o resultado do meu teste
         //entao achei a senha descriptografada
         if(iguais(encrypt(teste), (char*)senha, 4)){
-            // cout << "Senha encontrada: " << teste << endl;//debug
             //teste eh um array nao um ponteiro, e eh local, logo eh necessario criar
             //um ponteiro para char que armazene a mesma coisa e seja usado no retorno
             char* result = (char*) new char(strlen(teste)+1);
@@ -94,7 +89,6 @@ void* descriptografa(void* senha){
 
         //finaliza caso testar com ZZZZ e nao achar
         if(strcmp(teste, "ZZZZ") == 0){
-            // cout << "Cheguei em ZZZZ\n";//debug
             break;
         }
 
@@ -194,23 +188,6 @@ int main(int argc, char** argv){
     for(int i = 0; i < n; i++){
         cout << (char*)senhasDescriptografadas[i] << endl;
     }
-
-    /*//debug para visualizar as senhas
-    //visualiza as senhas criptografadas
-    cout << "Senhas Criptografadas:\n";
-    for(int i = 0; i < n; i++){
-        cout << "Senha [" << i << "]: " << senhasCriptografadas[i] << endl;
-    }
-
-    cout << endl;
-
-    //visualiza as senhas descriptografadas
-    // for(int i = 0; i < senhasCriptografadas.size(); i++){
-    cout << "Senhas Descriptografadas:\n";
-    for(int i = 0; i < n; i++){
-        cout << "Senha [" << i << "]: " << (char*)senhasDescriptografadas[i] << endl;
-    }
-    */
 
     return 0;
 }
