@@ -72,7 +72,7 @@ bool iguais(const char* str1, const char* str2, const int& qtd){
     return true;
 }
 
-void* descriptografa(void* senha){
+char* descriptografa(void* senha){
     //inicializa os testes com AAAA
     char teste[] = "AAAA";
 
@@ -84,7 +84,7 @@ void* descriptografa(void* senha){
             //um ponteiro para char que armazene a mesma coisa e seja usado no retorno
             char* result = (char*) new char(strlen(teste)+1);
             strcpy(result, teste);
-            return (void*)result;
+            return result;
         }
 
         //finaliza caso testar com ZZZZ e nao achar
@@ -140,7 +140,7 @@ vector<string> read(const string& arquivo){
     return vec;
 }
 
-void write(void* senhas[], const int& n, const string& saida){
+void write(vector<string> senhas, const int& n, const string& saida){
     //cria um fluxo de saida (para escrever no arquivo)
     ofstream fp;
 
@@ -155,7 +155,7 @@ void write(void* senhas[], const int& n, const string& saida){
 
     //escreve todas as senhas no arquivo
     for(int i = 0; i < n; i++){
-        fp << (char*)senhas[i] << endl;
+        fp << senhas[i] << endl;
     }
 
     //fecha o arquivo
@@ -197,19 +197,11 @@ int main(int argc, char** argv){
     int n = senhasCriptografadas.size();//armazena a qtd de senhas
 
     //cria um array para guardar as senhas descriptografadas
-    void* senhasDescriptografadas[n];
+    vector<string> senhasDescriptografadas(n);
 
-    //criar as variaveis do tipo thread para cada senha presente no arquivo
-    pthread_t thread[n];
-
-    //cria uma thread que vai executar a funcao com cada senha
+    //executa a funcao com cada senha
     for(int i = 0; i < n; i++){
-        pthread_create(&thread[i], NULL, descriptografa, (void*)(senhasCriptografadas[i].c_str()));
-    }
-
-    //da um join em cada thread e armazena a resposta nesse array
-    for(int i = 0; i < n; i++){
-        pthread_join(thread[i], &senhasDescriptografadas[i]);
+        senhasDescriptografadas[i] = descriptografa((void*)senhasCriptografadas[i].c_str());
     }
 
     //escreve as senhas descriptografadas em uma pasta especificada
