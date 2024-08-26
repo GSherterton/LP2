@@ -1,6 +1,6 @@
-Para poder executar o programa deve-se primeiro compilar os programas quebra_senhas.cpp e o executa_quebra_senhas.cpp
-Após compilados deve se chamar o executavel de executa_quebra_senhas passando como parametros o nome do executavel de
-quebra_senhas, o nome da pasta contendo as senhas e o nome da pasta onde ficarão os resultados
+Para poder executar o programa deve-se primeiro compilar o programa executa_quebra_senhas.cpp
+Após compilado deve se chamar o executavel de executa_quebra_senhas passando como parametros
+o nome da pasta contendo as senhas e o nome da pasta onde ficarão os resultados
 Mais explicitamente, deve-se usar os comandos:
     g++ executa_quebra_senhas.cpp -std=c++17 -lstdc++ -pthread -o executa
     ./executa ./senhas/ ./decodificadas/
