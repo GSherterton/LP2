@@ -1,9 +1,5 @@
 {
     "files.associations": {
-        "iostream": "cpp",
-        "ostream": "cpp",
-        "*.tcc": "cpp",
-        "exemplo_retorno_thread": "c",
         "new": "cpp"
     }
 }
